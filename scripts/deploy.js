@@ -1,23 +1,22 @@
-// Deployment script for ERC20Factory
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("Deploying ERC20Factory...");
+  console.log("Deploying GovernanceToken...");
 
-  // Get the deployer's address
   const [deployer] = await ethers.getSigners();
   console.log("Deploying with account:", deployer.address);
 
-  // Deploy the ERC20Factory
-  const ERC20Factory = await ethers.getContractFactory("ERC20Factory");
-  const factory = await ERC20Factory.deploy(deployer.address);
-  
-  await factory.waitForDeployment();
-  
-  const factoryAddress = await factory.getAddress();
-  console.log("ERC20Factory deployed to:", factoryAddress);
-  
-  console.log("Deployment completed successfully!");
+  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
+  const governanceToken = await GovernanceToken.deploy("GovernanceToken", "GT");
+  await governanceToken.deployed();
+  console.log("GovernanceToken deployed to:", governanceToken.address);
+
+  console.log("Deploying GovernorContract...");
+
+  const GovernorContract = await ethers.getContractFactory("GovernorContract");
+  const governorContract = await GovernorContract.deploy(governanceToken.address);
+  await governorContract.deployed();
+  console.log("GovernorContract deployed to:", governorContract.address);
 }
 
 main()
@@ -25,4 +24,4 @@ main()
   .catch((error) => {
     console.error(error);
     process.exit(1);
-  }); 
+  });
