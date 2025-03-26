@@ -1,103 +1,195 @@
-# Düşük Ücretli ERC20 Token Fabrikası
+# ERC20 Token Factory with Advanced Security Features
 
-Bu proje, Sepolia test ağında çalışan ve düşük ücretlerle ERC20 token oluşturmanıza olanak sağlayan bir token fabrikası içerir.
+A professional-grade ERC20 token factory deployed on the Sepolia testnet, enabling secure and cost-effective token creation with advanced security features and governance capabilities.
 
-## Özellikler
+## Overview
 
-- **Güvenli ERC20 Token**: Anti-whale mekanizması, kara liste, bekleme süresi ve maksimum işlem limitlerine sahip
-- **Token Fabrikası**: Özelleştirilebilir token'lar oluşturmak için fabrika kontratı
-- **Düşük Ücretler**: Sepolia ağında kullanım için optimize edilmiş düşük ücretler
+This project implements a comprehensive token factory solution that allows users to create customized ERC20 tokens with built-in security mechanisms and optional governance features.
 
-## Kurulum
+## Key Features
 
-1. Projeyi klonlayın:
+### Security Mechanisms
+- **Anti-Whale Protection**: Prevents market manipulation through transaction limits
+- **Blacklist Functionality**: Advanced address control for enhanced security
+- **Cooldown System**: Configurable trading intervals
+- **Transaction Limits**: Customizable maximum transaction amounts
+- **Wallet Balance Caps**: Prevents token accumulation
+
+### Technical Features
+- **OpenZeppelin Integration**: Built on battle-tested smart contract standards
+- **Gas Optimization**: Minimized transaction costs
+- **Governance Ready**: Optional DAO governance capabilities
+- **Modular Design**: Extensible architecture for future upgrades
+
+## Technical Setup
+
+### Prerequisites
+- Node.js (v14+ recommended)
+- npm or yarn
+- Hardhat
+- MetaMask or similar Web3 wallet
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd erc20-token-factory
 ```
-git clone <repo-url>
-cd <repo-directory>
-```
 
-2. Bağımlılıkları yükleyin:
-```
+2. Install dependencies:
+```bash
 npm install
 ```
 
-3. `.env.example` dosyasını `.env` olarak kopyalayın ve gerekli bilgileri ekleyin:
-```
+3. Configure environment:
+```bash
 cp .env.example .env
 ```
 
-4. `.env` dosyasını düzenleyin:
-   - `SEPOLIA_RPC_URL`: Sepolia RPC URL'inizi ekleyin (Infura, Alchemy vb.)
-   - `PRIVATE_KEY`: Metamask veya başka bir cüzdandan özel anahtarınızı ekleyin
-   - `ETHERSCAN_API_KEY`: Kontrat doğrulama için Etherscan API anahtarınızı ekleyin
-
-## Deployment
-
-Sepolia test ağına deploy etmek için:
-
+4. Environment Configuration:
+```plaintext
+SEPOLIA_RPC_URL=<your-sepolia-endpoint>
+PRIVATE_KEY=<your-private-key>
+ETHERSCAN_API_KEY=<your-etherscan-api-key>
 ```
+
+## Deployment Process
+
+### Testnet Deployment
+Deploy to Sepolia testnet:
+```bash
 npx hardhat run scripts/deploy-sepolia.js --network sepolia
 ```
 
-## Token Oluşturma
-
-1. Deployment sonrasında verilen kontrat adresini kaydedin
-2. Metamask'te Sepolia test ağına bağlanın
-3. Kontrat adresini kullanarak ERC20Factory ile etkileşime geçin:
-   - `createToken` fonksiyonunu çağırın
-   - Gerekli parametreleri ve değeri (0.0015 ETH) gönderin
-   - Token'ınız oluşturulacak ve adresinize kaydedilecektir
-
-## Ücretler
-
-- Token oluşturma: 0.001 ETH
-- Kara liste özelliği: 0.0005 ETH ek ücret
-
-## Kontrat Doğrulama
-
-Deploy script çalıştırıldıktan sonra, kontratı Etherscan'de doğrulamak için:
-
-```
-npx hardhat verify --network sepolia <DEPLOYED_CONTRACT_ADDRESS> <YOUR_ADDRESS>
+### Contract Verification
+Verify on Etherscan:
+```bash
+npx hardhat verify --network sepolia <contract-address> <constructor-arguments>
 ```
 
-## Governance Token Kontratı
+## Token Creation Guide
 
+### Fee Structure
+- Base Creation Fee: 0.001 ETH
+- Advanced Security Features: 0.0005 ETH
+
+### Creation Steps
+1. Access the factory contract
+2. Configure token parameters:
+   - Name & Symbol
+   - Initial Supply
+   - Transaction Limits
+   - Security Features
+3. Submit creation transaction with required fee
+
+## Development
+
+### Testing
+Run the test suite:
+```bash
+npx hardhat test
+```
+
+### Local Development
+Start local node:
+```bash
+npx hardhat node
+```
+
+Deploy locally:
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+## Smart Contract Architecture
+
+### Core Contracts
+
+#### ERC20Factory
+- Token creation and management
+- Fee handling
+- Security feature implementation
+
+#### SecureERC20Token
+- Standard ERC20 functionality
+- Advanced security mechanisms
+- Configurable parameters
+
+#### GovernanceToken
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-
 contract GovernanceToken is ERC20Votes {
     constructor(string memory name, string memory symbol)
         ERC20(name, symbol)
         ERC20Permit(name)
     {
-        _mint(msg.sender, 1000000 * 10 ** decimals()); // İlk arz
+        _mint(msg.sender, 1000000 * 10 ** decimals());
     }
-
-    // Aşağıdaki işlevler ERC20Votes tarafından sağlanır ve geçersiz kılınmalıdır
-    function _afterTokenTransfer(address from, address to, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._afterTokenTransfer(from, to, amount);
-    }
-
-    function _mint(address to, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._mint(to, amount);
-    }
-
-    function _burn(address account, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._burn(account, amount);
-    }
+    // Governance implementation
 }
 ```
+
+## Security Considerations
+
+### Implemented Safeguards
+- Reentrancy protection
+- Access control mechanisms
+- Transaction validation
+- Balance checks
+- Blacklist functionality
+
+### Best Practices
+- OpenZeppelin standard implementations
+- Comprehensive testing suite
+- Professional audit recommendations
+- Gas optimization
+
+## Documentation
+
+### API Reference
+Detailed documentation available in `/docs`:
+- Contract interfaces
+- Function specifications
+- Event descriptions
+- Security features
+
+### Integration Guide
+Step-by-step integration instructions for:
+- Web3 applications
+- DeFi protocols
+- Governance systems
+
+## Support and Maintenance
+
+### Technical Support
+- GitHub Issues
+- Documentation
+- Community forums
+
+### Updates and Upgrades
+- Regular security patches
+- Feature updates
+- Performance optimizations
+
+## Legal
+
+### License
+MIT License - see [LICENSE](LICENSE) for details
+
+### Disclaimer
+This software is provided "as is", without warranty of any kind. Use at your own risk.
+
+## Contributing
+
+### Guidelines
+1. Fork the repository
+2. Create feature branch
+3. Submit pull request
+4. Follow code standards
+5. Include tests
+
+### Code Standards
+- Solidity style guide compliance
+- Test coverage requirements
+- Documentation standards
+- Gas optimization practices
