@@ -1,2 +1,18 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Node.js specific
+node_modules/* binary
+node_modules/* -diff
+node_modules/* -merge
+node_modules/* -text
+
+# Environment variables
+.env binary
+.env -diff
+.env -merge
+.env -text
+.env.* binary
+.env.* -diff
+.env.* -merge
+.env.* -text

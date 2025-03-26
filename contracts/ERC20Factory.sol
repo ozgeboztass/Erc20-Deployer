@@ -43,13 +43,13 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
         require(!_existingNames[name], "Name exists");
         require(!_existingSymbols[symbol], "Symbol exists");
         
-        // Fazla ETH iadesi
+        // Excess ETH refund
         uint256 requiredFee = creationFee + (config.blacklistable ? antiBotFee : 0);
         if(msg.value > requiredFee) {
             payable(msg.sender).transfer(msg.value - requiredFee);
         }
 
-        // Ücret transferi
+        // Fee transfer
         (bool sent,) = feeRecipient.call{value: requiredFee}("");
         require(sent, "Fee transfer failed");
 
@@ -62,12 +62,12 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
             config.maxWalletBalance
         );
 
-        // Token konfigürasyonu
+        // Token configuration
         if(config.cooldownTime > 0) {
             token.setCooldownTime(config.cooldownTime);
         }
 
-        // Kayıt işlemleri
+        // Registration operations
         _creatorTokens[msg.sender].add(address(token));
         _deployedTokens.add(address(token));
         _existingNames[name] = true;
@@ -77,7 +77,7 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
         return address(token);
     }
 
-    // Gelişmiş güvenlik fonksiyonları
+    // Advanced security functions
     function setCreationFee(uint256 fee) external onlyOwner {
         creationFee = fee;
     }
@@ -90,7 +90,7 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
         IERC20(tokenAddress).transfer(owner(), IERC20(tokenAddress).balanceOf(address(this)));
     }
 
-    // View fonksiyonları
+    // View functions
     function getTokensByCreator(address creator) external view returns (address[] memory) {
         return _creatorTokens[creator].values();
     }

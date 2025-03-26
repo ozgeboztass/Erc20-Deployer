@@ -9,10 +9,10 @@ contract GovernanceToken is ERC20Votes {
         ERC20(name, symbol)
         ERC20Permit(name)
     {
-        _mint(msg.sender, 1000000 * 10 ** decimals()); // İlk arz
+        _mint(msg.sender, 1000000 * 10 ** decimals()); // Initial supply
     }
 
-    // Aşağıdaki işlevler ERC20Votes tarafından sağlanır ve geçersiz kılınmalıdır
+    // The following functions are provided by ERC20Votes and must be overridden
     function _afterTokenTransfer(address from, address to, uint256 amount)
         internal
         override(ERC20, ERC20Votes)

@@ -64,7 +64,7 @@ contract SecureERC20Token is ERC20, ERC20Permit, ERC20Burnable, Pausable, Ownabl
             "Blacklisted address"
         );
         
-        // Anti-whale mechanism
+        // Anti-whale mechanism check
         if(to != address(0)) {
             require(
                 balanceOf(to) + amount <= maxWalletBalance, 
@@ -72,7 +72,7 @@ contract SecureERC20Token is ERC20, ERC20Permit, ERC20Burnable, Pausable, Ownabl
             );
         }
         
-        // Cooldown control (except for owner and zero address)
+        // Cooldown check (except for owner and zero address)
         if(from != owner() && to != owner() && msg.sender != owner() && from != address(0)) {
             require(
                 _lastTxTime[msg.sender] + cooldownTime <= block.timestamp, 
@@ -81,6 +81,7 @@ contract SecureERC20Token is ERC20, ERC20Permit, ERC20Burnable, Pausable, Ownabl
             _lastTxTime[msg.sender] = block.timestamp;
         }
         
+        // Maximum transaction amount check
         require(amount <= maxTxAmount, "Exceeds maximum transaction amount");
         
         super._beforeTokenTransfer(from, to, amount);
