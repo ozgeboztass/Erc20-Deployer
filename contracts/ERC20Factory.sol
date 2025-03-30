@@ -11,41 +11,32 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     event TokenCreated(address indexed tokenAddress, string name, address creator);
-    
-    struct TokenConfig {
-        uint256 maxTxAmount;
-        uint256 maxWalletBalance;
-        bool blacklistable;
-        bool pausable;
-        uint256 cooldownTime;
-    }
 
     mapping(address => EnumerableSet.AddressSet) private _creatorTokens;
     mapping(string => bool) private _existingNames;
     mapping(string => bool) private _existingSymbols;
     EnumerableSet.AddressSet private _deployedTokens;
-    
+
     uint256 public creationFee = 0.001 ether;
     address public feeRecipient;
     uint256 public antiBotFee = 0.0005 ether;
 
-    constructor(address _feeRecipient) Ownable(msg.sender) {
-        feeRecipient = _feeRecipient;
+    constructor() Ownable(msg.sender) {
+        feeRecipient = msg.sender;
     }
 
     function createToken(
         string memory name,
         string memory symbol,
-        uint256 initialSupply,
-        TokenConfig memory config
+        uint256 initialSupply
     ) external payable nonReentrant returns (address) {
-        require(msg.value >= creationFee + (config.blacklistable ? antiBotFee : 0), "Insufficient fee");
+        require(msg.value >= creationFee , "Insufficient fee");
         require(!_existingNames[name], "Name exists");
         require(!_existingSymbols[symbol], "Symbol exists");
-        
+
         // Excess ETH refund
-        uint256 requiredFee = creationFee + (config.blacklistable ? antiBotFee : 0);
-        if(msg.value > requiredFee) {
+        uint256 requiredFee = creationFee ;
+        if (msg.value > requiredFee) {
             payable(msg.sender).transfer(msg.value - requiredFee);
         }
 
@@ -57,17 +48,10 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
             name,
             symbol,
             initialSupply,
-            msg.sender,
-            config.maxTxAmount,
-            config.maxWalletBalance
+            msg.sender
         );
 
-        // Token configuration
-        if(config.cooldownTime > 0) {
-            token.setCooldownTime(config.cooldownTime);
-        }
-
-        // Registration operations
+        // Register the new token
         _creatorTokens[msg.sender].add(address(token));
         _deployedTokens.add(address(token));
         _existingNames[name] = true;
@@ -98,4 +82,4 @@ contract ERC20Factory is Ownable, ReentrancyGuard {
     function getAllTokens() external view returns (address[] memory) {
         return _deployedTokens.values();
     }
-} 
+}
